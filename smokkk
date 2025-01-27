@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Cigarrillos</title>
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    <style>
+        /* Diseño básico */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+            background: #f5e6e0;
+            color: #4a4a4a;
+            box-sizing: border-box;
+        }
+
+
+        .container {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+
+        button {
+            padding: 10px 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%; /* Hacer que los botones ocupen el 100% del ancho en pantallas pequeñas */
+            margin: 10px 0;
+        }
+
+
+        .chart-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+
+        /* Adaptaciones para pantallas más pequeñas */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+
+            .container {
+                padding: 10px;
+            }
+
+
+            button {
+                width: 100%;
+                font-size: 16px;
+            }
+
+
+            .chart-container {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contador de Cigarrillos</h1>
+
+
+        <div id="counter">
+            <h2>Cigarrillos Fumados: <span id="cigaretteCount">0</span></h2>
+            <button id="addCigaretteButton">Sumar Cigarrillo</button>
+        </div>
+
+
+        <div id="savedCounter">
+            <h2>Cigarros Ahorrados: <span id="savedCigaretteCount">0</span></h2>
+            <button id="addSavedCigaretteButton">Sumar Cigarro Ahorrado</button>
+        </div>
+
+
+        <button id="resetButton">Reiniciar Contador</button>
+
+
+        <div id="calendar"></div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Cargar datos desde el almacenamiento local
+            let cigarettes = JSON.parse(localStorage.getItem('cigarettes')) || [];
+            let savedCigarettes = JSON.parse(localStorage.getItem('savedCigarettes')) || 0;
+
+
+            // Actualizar la vista de contadores
+            function updateDisplay() {
+                document.getElementById('cigaretteCount').textContent = cigarettes.length;
+                document.getElementById('savedCigaretteCount').textContent = savedCigarettes;
+            }
+
+
+            // Función para agregar un cigarro
+            function addCigarette() {
+                cigarettes.push(new Date().toISOString());
+                localStorage.setItem('cigarettes', JSON.stringify(cigarettes));
+                updateDisplay();
+            }
+
+
+            // Función para agregar un cigarro ahorrado
+            function addSavedCigarette() {
+                savedCigarettes++;
+                localStorage.setItem('savedCigarettes', savedCigarettes);
+                updateDisplay();
+            }
+
+
+            // Función para reiniciar el contador
+            function resetCount() {
+                if (confirm('¿Seguro que quieres reiniciar el conteo?')) {
+                    cigarettes = [];
+                    savedCigarettes = 0;
+                    localStorage.setItem('cigarettes', JSON.stringify(cigarettes));
+                    localStorage.setItem('savedCigarettes', savedCigarettes);
+                    updateDisplay();
+                }
+            }
+
+
+            // Agregar eventos a los botones
+            document.getElementById('addCigaretteButton').addEventListener('click', addCigarette);
+            document.getElementById('addSavedCigaretteButton').addEventListener('click', addSavedCigarette);
+            document.getElementById('resetButton').addEventListener('click', resetCount);
+
+
+            // Inicializar la vista
+            updateDisplay();
+
+
+            // Inicializar el calendario
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: cigarettes.map(time => ({
+                    title: '🚬',
+                    start: time,
+                    allDay: true
+                }))
+            });
+            calendar.render();
+        });
+    </script>
+</body>
+</html>
+
+
+
